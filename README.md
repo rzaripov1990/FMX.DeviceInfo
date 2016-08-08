@@ -31,5 +31,5 @@
 * function IsGPSActive(HIGH_ACCURACY: Boolean = False): Boolean; - _GPS enabled? [ANDROID]_
 * function IsDeviceType: TDeviceInfo.TDeviceClass; - _device type (Unknown, Desktop, Phone, Tablet, etc) [ALL PLATFORMS]_
 * function IsTablet: Boolean; - _the application is running on the tablet? [ALL PLATFORMS]_
-* function IsPortraitOrientation: Boolean; - current orientation is a Portrait? [ALL PLATFORMS]_
-* function IsLargePhone: Boolean; - _ Phablet? [ANDROID/IOS]_
+* function IsPortraitOrientation: Boolean; - _current orientation is a Portrait? [ALL PLATFORMS]_
+* function IsLargePhone: Boolean; - _Phablet? [ANDROID/IOS]_
