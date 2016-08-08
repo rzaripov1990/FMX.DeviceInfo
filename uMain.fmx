@@ -1,0 +1,30 @@
+object Form9: TForm9
+  Tag = 1
+  Left = 0
+  Top = 0
+  Caption = 'DeviceInfo'
+  ClientHeight = 418
+  ClientWidth = 378
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnActivate = FormActivate
+  DesignerMasterStyle = 3
+  object ListBox1: TListBox
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    Position.X = 8.000000000000000000
+    Position.Y = 8.000000000000000000
+    Size.Width = 361.000000000000000000
+    Size.Height = 404.000000000000000000
+    Size.PlatformDefault = False
+    StyleLookup = 'transparentlistboxstyle'
+    TabOrder = 0
+    DisableFocusEffect = True
+    ItemHeight = 50.000000000000000000
+    DefaultItemStyles.ItemStyle = 'listboxitembottomdetail'
+    DefaultItemStyles.GroupHeaderStyle = ''
+    DefaultItemStyles.GroupFooterStyle = ''
+    Viewport.Width = 361.000000000000000000
+    Viewport.Height = 404.000000000000000000
+  end
+end
