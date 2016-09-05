@@ -4,7 +4,7 @@ uses
   System.StartUpCopy,
   FMX.Forms,
   uMain in 'uMain.pas' {Form9},
-  uDevice in 'uDevice.pas';
+  FMX.DeviceInfo in 'FMX.DeviceInfo.pas';
 
 {$R *.res}
 

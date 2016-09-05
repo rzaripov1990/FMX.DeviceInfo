@@ -1,4 +1,4 @@
-unit uDevice;
+unit FMX.DeviceInfo;
 
 {
   Device Info
