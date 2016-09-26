@@ -21,6 +21,7 @@
     diScale: Single;
     diMobileOperator: string;
     diTimeZone: integer;
+    diIsIntel: Boolean;
   end;
 ```
 
