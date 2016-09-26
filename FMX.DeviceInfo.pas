@@ -26,7 +26,8 @@ type
   TmyNetworkType = (ntNone, ntUnknown, nt2G, nt3G, nt4G);
 
 const
-  TmyConnectionTypeString: array [TmyConnectionType] of string = ('None', 'Unknown', 'Wi-Fi', 'Mobile Data', 'Ethernet');
+  TmyConnectionTypeString: array [TmyConnectionType] of string = ('None', 'Unknown', 'Wi-Fi', 'Mobile Data',
+    'Ethernet');
   TmyNetworkTypeString: array [TmyNetworkType] of string = ('None', 'Unknown', '2G', '3G', '4G');
 
 type
@@ -48,6 +49,7 @@ type
     diScale: Single;
     diMobileOperator: string;
     diTimeZone: integer;
+    diIsIntel: Boolean;
   end;
 
 var
@@ -82,8 +84,8 @@ function IsLargePhone: Boolean;
 
 const
   libc = '/usr/lib/libc.dylib';
-function sysctlbyname(Name: MarshaledAString; oldp: pointer; oldlen: Psize_t; newp: pointer; newlen: size_t): integer; cdecl;
-  external libc name _PU + 'sysctlbyname';
+function sysctlbyname(Name: MarshaledAString; oldp: pointer; oldlen: Psize_t; newp: pointer; newlen: size_t): integer;
+  cdecl; external libc name _PU + 'sysctlbyname';
 {$ENDIF}
 //
 {$IFDEF MSWINDOWS}
@@ -158,7 +160,8 @@ begin
 {$IF defined(ANDROID) or defined(IOS)}
   ThisDevice := TDeviceInfo.ThisDevice;
   if ThisDevice <> nil then
-    Result := Max(ThisDevice.MinLogicalScreenSize.Width, ThisDevice.MinLogicalScreenSize.Height) >= MinLogicaSizeForLargePhone
+    Result := Max(ThisDevice.MinLogicalScreenSize.Width, ThisDevice.MinLogicalScreenSize.Height) >=
+      MinLogicaSizeForLargePhone
   else
     Result := true;
 {$ENDIF}
@@ -190,9 +193,12 @@ begin
     Result := ctWIFI
   else
   begin
-    if (jType = TJConnectivityManager.JavaClass.TYPE_MOBILE) or (jType = TJConnectivityManager.JavaClass.TYPE_MOBILE_DUN) or
-      (jType = TJConnectivityManager.JavaClass.TYPE_MOBILE_HIPRI) or (jType = TJConnectivityManager.JavaClass.TYPE_MOBILE_MMS) or
-      (jType = TJConnectivityManager.JavaClass.TYPE_MOBILE_SUPL) or (jType = TJConnectivityManager.JavaClass.TYPE_WIMAX) then
+    if (jType = TJConnectivityManager.JavaClass.TYPE_MOBILE) or
+      (jType = TJConnectivityManager.JavaClass.TYPE_MOBILE_DUN) or
+      (jType = TJConnectivityManager.JavaClass.TYPE_MOBILE_HIPRI) or
+      (jType = TJConnectivityManager.JavaClass.TYPE_MOBILE_MMS) or
+      (jType = TJConnectivityManager.JavaClass.TYPE_MOBILE_SUPL) or (jType = TJConnectivityManager.JavaClass.TYPE_WIMAX)
+    then
       Result := ctMobile;
   end;
 end;
@@ -200,14 +206,19 @@ end;
 function getMobileSubType(jType: integer): TmyNetworkType;
 begin
   Result := ntUnknown;
-  if (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_GPRS) or (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_EDGE) or
-    (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_CDMA) or (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_1xRTT) or
+  if (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_GPRS) or
+    (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_EDGE) or (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_CDMA)
+    or (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_1xRTT) or
     (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_IDEN) then
     Result := nt2G
-  else if (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_UMTS) or (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_EVDO_0)
-    or (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_EVDO_A) or (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_HSDPA) or
-    (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_HSUPA) or (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_HSPA) or
-    (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_EVDO_B) or (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_EHRPD) or
+  else if (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_UMTS) or
+    (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_EVDO_0) or
+    (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_EVDO_A) or
+    (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_HSDPA) or
+    (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_HSUPA) or
+    (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_HSPA) or
+    (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_EVDO_B) or
+    (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_EHRPD) or
     (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_HSPAP) then
     Result := nt3G
   else if (jType = TJTelephonyManager.JavaClass.NETWORK_TYPE_LTE) then
@@ -314,9 +325,9 @@ end;
 function IsNetConnected: Boolean;
 {$IFDEF MSWINDOWS}
 const
-  INTERNET_CONNECTION_MODEM = 1;
-  INTERNET_CONNECTION_LAN = 2;
-  INTERNET_CONNECTION_PROXY = 4;
+  INTERNET_CONNECTION_MODEM      = 1;
+  INTERNET_CONNECTION_LAN        = 2;
+  INTERNET_CONNECTION_PROXY      = 4;
   INTERNET_CONNECTION_MODEM_BUSY = 8;
 var
   dwConnectionTypes: DWORD;
@@ -429,12 +440,18 @@ var
   ScreenService: IFMXScreenService;
   LocaleService: IFMXLocaleService;
   PhoneService: IFMXPhoneDialerService;
+{$IFDEF ANDROID}
+  I: integer;
+  arrObjAbis: TJavaObjectArray<JString>;
+  sAbis: string;
+{$ENDIF}
 begin
   DeviceInfo.diPlatform := sPlatform[TOSVersion.Platform];
   DeviceInfo.diPlatformT := TOSVersion.Platform;
   DeviceInfo.diArchitecture := sArchitecture[TOSVersion.Architecture];
   DeviceInfo.diArchitectureT := TOSVersion.Architecture;
   DeviceInfo.diMobileOperator := 'unknown';
+  DeviceInfo.diIsIntel := DeviceInfo.diArchitecture.Contains('IntelX');
 
   case TOSVersion.Platform of
     pfMacOS:
@@ -467,10 +484,25 @@ begin
     pfAndroid:
       begin
 {$IFDEF ANDROID}
-        DeviceInfo.diArchitecture2 := JStringToString(TJBuild.JavaClass.CPU_ABI);
+        if TOSVersion.Major >= 5 then
+        begin
+          sAbis := '';
+          arrObjAbis := TJBuild.JavaClass.SUPPORTED_ABIS;
+          for I := 0 to arrObjAbis.Length - 1 do
+            sAbis := sAbis + ',' + JStringToString(arrObjAbis.Items[I]);
+          sAbis := sAbis.trim([',']);
+        end
+        else
+          sAbis := JStringToString(TJBuild.JavaClass.CPU_ABI) + ',' + JStringToString(TJBuild.JavaClass.CPU_ABI2);
+
+        DeviceInfo.diArchitecture2 := sAbis;
+        DeviceInfo.diIsIntel := sAbis.Contains('x86') or JStringToString(TJBuild.JavaClass.FINGERPRINT)
+          .Contains('intel');
+
         DeviceInfo.diPlatformVer := GetCodename(JStringToString(TJBuild_VERSION.JavaClass.release)) + ' ' +
           JStringToString(TJBuild_VERSION.JavaClass.release);
-        DeviceInfo.diDevice := JStringToString(TJBuild.JavaClass.MANUFACTURER) + ' ' + JStringToString(TJBuild.JavaClass.model);
+        DeviceInfo.diDevice := JStringToString(TJBuild.JavaClass.MANUFACTURER) + ' ' +
+          JStringToString(TJBuild.JavaClass.model);
         GetAddress(DeviceInfo.diMacAddress, DeviceInfo.diIPAddress);
 
         if TPlatformServices.Current.SupportsPlatformService(IFMXPhoneDialerService, IInterface(PhoneService)) then

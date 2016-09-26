@@ -7,7 +7,7 @@
         <DeviceId Condition="'$(Platform)'=='Android'">066ab2310ac64b09</DeviceId>
         <DeviceId Condition="'$(Platform)'=='iOSDevice32'"/>
         <DeviceId Condition="'$(Platform)'=='iOSDevice64'"/>
-        <DeviceId Condition="'$(Platform)'=='iOSSimulator'"/>
+        <DeviceId Condition="'$(Platform)'=='iOSSimulator'">22642830-B5CA-4117-A1AE-46DFFA83CA4A</DeviceId>
     </PropertyGroup>
     <ItemGroup Condition="'$(Platform)'=='iOSDevice64'"/>
     <ItemGroup Condition="'$(Platform)'=='Win64'"/>
@@ -233,6 +233,15 @@
             <RemoteDir>DeviceInfo.app\</RemoteDir>
             <RemoteName>FM_SpotlightSearchIcon_100x100.png</RemoteName>
             <DeployClass>iPad_SpotLight100</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_58x58.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>DeviceInfo.app\</RemoteDir>
+            <RemoteName>FM_SpotlightSearchIcon_58x58.png</RemoteName>
+            <DeployClass>iPhone_Spotlight58</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
@@ -477,6 +486,15 @@
             <RemoteDir>DeviceInfo.app\</RemoteDir>
             <RemoteName>Default-Landscape-736h@3x.png</RemoteName>
             <DeployClass>iPhone_Launch2208</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_80x80.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>DeviceInfo.app\</RemoteDir>
+            <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+            <DeployClass>iPhone_Spotlight80</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>

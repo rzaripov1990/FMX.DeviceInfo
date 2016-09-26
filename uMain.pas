@@ -69,6 +69,11 @@ begin
 
     aItem := TListBoxItem.Create(nil);
     aItem.Parent := ListBox1;
+    aItem.ItemData.Detail := 'Maybe Is Intel';
+    aItem.Text := BoolToStr(diIsIntel, true);
+
+    aItem := TListBoxItem.Create(nil);
+    aItem.Parent := ListBox1;
     aItem.ItemData.Detail := 'Lang';
     aItem.Text := diLang;
 
@@ -125,8 +130,7 @@ begin
     aItem := TListBoxItem.Create(nil);
     aItem.Parent := ListBox1;
     aItem.ItemData.Detail := 'Carrier [ANDROID/IOS]';
-    aItem.Text := {$IF defined(ANDROID) or defined(IOS)} diMobileOperator {$ELSE} 'Not support'
-{$ENDIF};
+    aItem.Text := {$IF defined(ANDROID) or defined(IOS)} diMobileOperator {$ELSE} 'Not support' {$ENDIF};
 
     aItem := TListBoxItem.Create(nil);
     aItem.Parent := ListBox1;
@@ -164,6 +168,8 @@ begin
     aItem.ItemData.Detail := 'GPS Active '{$IFDEF ANDROID} + '[ANDROID]'{$ELSE} +
       'for current platform Result TRUE'{$ENDIF};
     aItem.Text := BoolToStr(IsGPSActive, true);
+
+    ShowMessage(diArchitecture2);
   end;
 end;
 
