@@ -42,5 +42,5 @@
 
 ![Android] (screenshots/android.png)
 ![Windows] (screenshots/win.png)
-![IOS] (screenshots/ios.png)
+![IOS] (screenshots/ios.jpg)
 ![MAC OS] (screenshots/macos.png)
