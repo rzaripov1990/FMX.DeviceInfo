@@ -3,7 +3,7 @@ object Form9: TForm9
   Left = 0
   Top = 0
   Caption = 'DeviceInfo'
-  ClientHeight = 418
+  ClientHeight = 643
   ClientWidth = 378
   FormFactor.Width = 320
   FormFactor.Height = 480
@@ -15,7 +15,7 @@ object Form9: TForm9
     Position.X = 8.000000000000000000
     Position.Y = 8.000000000000000000
     Size.Width = 361.000000000000000000
-    Size.Height = 404.000000000000000000
+    Size.Height = 629.000000000000000000
     Size.PlatformDefault = False
     StyleLookup = 'transparentlistboxstyle'
     TabOrder = 0
@@ -25,6 +25,6 @@ object Form9: TForm9
     DefaultItemStyles.GroupHeaderStyle = ''
     DefaultItemStyles.GroupFooterStyle = ''
     Viewport.Width = 361.000000000000000000
-    Viewport.Height = 404.000000000000000000
+    Viewport.Height = 629.000000000000000000
   end
 end

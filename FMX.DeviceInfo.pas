@@ -6,7 +6,7 @@ unit FMX.DeviceInfo;
 
   ANDROID permissions:
   ..access_network_state
-  ..acces_wifi_state
+  ..access_wifi_state
 }
 
 interface
@@ -187,6 +187,12 @@ end;
 //
 {$IFDEF ANDROID}
 
+function HasPermission(const Permission: string): Boolean;
+begin
+  Result := TAndroidHelper.Context.checkCallingOrSelfPermission(StringToJString(Permission))
+    = TJPackageManager.JavaClass.PERMISSION_GRANTED
+end;
+
 function getMobileType(jType: integer): TmyConnectionType;
 begin
   Result := ctUnknown; // Unknown connection type
@@ -232,18 +238,23 @@ function GetWifiManager: JWifiManager;
 var
   WifiManagerObj: JObject;
 begin
-  WifiManagerObj := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.WIFI_SERVICE);
-  if not Assigned(WifiManagerObj) then
-    raise Exception.Create('Could not locate Wifi Service');
-  Result := TJWifiManager.Wrap((WifiManagerObj as ILocalObject).GetObjectID);
-  if not Assigned(Result) then
-    raise Exception.Create('Could not access Wifi Manager');
+  Result := nil;
+  if HasPermission('android.permission.ACCESS_WIFI_STATE') then
+  begin
+    WifiManagerObj := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.WIFI_SERVICE);
+    if not Assigned(WifiManagerObj) then
+      raise Exception.Create('Could not locate Wifi Service');
+    Result := TJWifiManager.Wrap((WifiManagerObj as ILocalObject).GetObjectID);
+    if not Assigned(Result) then
+      raise Exception.Create('Could not access Wifi Manager');
+  end;
 end;
 
 function GetTelephonyManager: JTelephonyManager;
 var
   TelephoneServiceNative: JObject;
 begin
+  Result := nil;
   TelephoneServiceNative := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.TELEPHONY_SERVICE);
   if not Assigned(TelephoneServiceNative) then
     raise Exception.Create('Could not locate Telephony Service');
@@ -256,12 +267,16 @@ function GetConnectivityManager: JConnectivityManager;
 var
   ConnectivityServiceNative: JObject;
 begin
-  ConnectivityServiceNative := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.CONNECTIVITY_SERVICE);
-  if not Assigned(ConnectivityServiceNative) then
-    raise Exception.Create('Could not locate Connectivity Service');
-  Result := TJConnectivityManager.Wrap((ConnectivityServiceNative as ILocalObject).GetObjectID);
-  if not Assigned(Result) then
-    raise Exception.Create('Could not access Connectivity Manager');
+  Result := nil;
+  if HasPermission('android.permission.ACCESS_NETWORK_STATE') then
+  begin
+    ConnectivityServiceNative := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.CONNECTIVITY_SERVICE);
+    if not Assigned(ConnectivityServiceNative) then
+      raise Exception.Create('Could not locate Connectivity Service');
+    Result := TJConnectivityManager.Wrap((ConnectivityServiceNative as ILocalObject).GetObjectID);
+    if not Assigned(Result) then
+      raise Exception.Create('Could not access Connectivity Manager');
+  end;
 end;
 
 procedure GetAddress(out aMac, aWifiIP: string);
@@ -349,18 +364,13 @@ function IsNetworkType: TmyNetworkType;
 {$IFDEF ANDROID}
 var
   TelephoneManager: JTelephonyManager;
-  cellList: JObject;
-  infoGSM: JCellInfoGsm;
-  gsmStrength: JCellSignalStrength;
 {$ENDIF}
 begin
   Result := {$IF defined(MSWINDOWS) or defined(MACOS)}ntNone {$ELSE} ntUnknown{$ENDIF};
 {$IFDEF ANDROID}
   TelephoneManager := GetTelephonyManager;
   if (Assigned(TelephoneManager)) and (TelephoneManager.getSimState = TJTelephonyManager.JavaClass.SIM_STATE_READY) then
-  begin
     Result := getMobileSubType(TelephoneManager.getNetworkType);
-  end;
 {$ENDIF}
 end;
 
