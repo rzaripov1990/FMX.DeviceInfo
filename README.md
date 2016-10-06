@@ -40,7 +40,5 @@
 * function IsPortraitOrientation: Boolean; - _current orientation is a Portrait? [ALL PLATFORMS]_
 * function IsLargePhone: Boolean; - _Phablet? [ANDROID/IOS]_
 
-![Android] (screenshots/android.png)
-![Windows] (screenshots/win.png)
-![IOS] (screenshots/ios.jpg)
-![MAC OS] (screenshots/macos.png)
+![Android] (screenshots/android.png) ![Windows] (screenshots/win.png)
+![IOS] (screenshots/ios.png) ![MAC OS(VM)] (screenshots/macos.png)
