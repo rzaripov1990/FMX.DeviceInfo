@@ -168,8 +168,6 @@ begin
     aItem.ItemData.Detail := 'GPS Active '{$IFDEF ANDROID} + '[ANDROID]'{$ELSE} +
       'for current platform Result TRUE'{$ENDIF};
     aItem.Text := BoolToStr(IsGPSActive, true);
-
-    ShowMessage(diArchitecture2);
   end;
 end;
 

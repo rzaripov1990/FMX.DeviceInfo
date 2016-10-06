@@ -12,13 +12,13 @@ unit FMX.DeviceInfo;
 interface
 
 uses
-  System.SysUtils, System.Types, System.Devices, FMX.Platform, FMX.PhoneDialer
+  System.SysUtils, System.Types, System.Devices, FMX.Platform
 {$IFDEF MSWINDOWS}, Winapi.Windows {$ENDIF}
 {$IFDEF ANDROID}, AndroidApi.JNI.GraphicsContentViewText, AndroidApi.JNI.OS, AndroidApi.Helpers, AndroidApi.JNI.Net,
   AndroidApi.JNI.JavaTypes, AndroidApi.JNIBridge, AndroidApi.JNI.Provider, AndroidApi.JNI.Telephony,
-  FMX.PhoneDialer.Android {$ENDIF}
+  FMX.PhoneDialer, FMX.PhoneDialer.Android {$ENDIF}
 {$IFDEF MACOS}, Macapi.ObjectiveC, Posix.Wchar, Macapi.CoreFoundation, Macapi.Dispatch, Posix.SysSocket
-{$IFDEF IOS}, iOSApi.CocoaTypes, iOSApi.Foundation, iOSApi.UIKit{$ENDIF}
+{$IFDEF IOS}, iOSApi.CocoaTypes, iOSApi.Foundation, iOSApi.UIKit, FMX.Helpers.iOS{$ENDIF}
 {$ENDIF MACOS};
 
 type
@@ -80,13 +80,13 @@ function IsPortraitOrientation: Boolean;
 /// <summary> Это Фаблет? [ANDROID/IOS] </summary>
 function IsLargePhone: Boolean;
 
-{$IFDEF MacOS}
+{$IFDEF MacOS }
 
 const
   libc = '/usr/lib/libc.dylib';
 function sysctlbyname(Name: MarshaledAString; oldp: pointer; oldlen: Psize_t; newp: pointer; newlen: size_t): integer;
   cdecl; external libc name _PU + 'sysctlbyname';
-{$ENDIF}
+{$ENDIF }
 //
 {$IFDEF MSWINDOWS}
 function InternetGetConnectedState(lpdwFlags: LPDWORD; dwReserved: DWORD): BOOL; stdcall;
@@ -136,6 +136,9 @@ end;
 function IsTablet: Boolean;
 begin
   Result := IsDeviceType = TDeviceInfo.TDeviceClass.Tablet;
+{$IFDEF IOS}
+  Result := IsPad;
+{$ENDIF}
 end;
 
 function IsPortraitOrientation: Boolean;
@@ -439,11 +442,11 @@ var
   sScreenSize: TPoint;
   ScreenService: IFMXScreenService;
   LocaleService: IFMXLocaleService;
-  PhoneService: IFMXPhoneDialerService;
 {$IFDEF ANDROID}
   I: integer;
   arrObjAbis: TJavaObjectArray<JString>;
   sAbis: string;
+  PhoneService: IFMXPhoneDialerService;
 {$ENDIF}
 begin
   DeviceInfo.diPlatform := sPlatform[TOSVersion.Platform];
@@ -471,14 +474,14 @@ begin
           DeviceInfo.diMacAddress := identifierForVendor.UUIDString.UTF8String;
           DeviceInfo.diIPAddress := 'unknown';
         end;
-        if TPlatformServices.Current.SupportsPlatformService(IFMXPhoneDialerService, IInterface(PhoneService)) then
-        begin
+        { if TPlatformServices.Current.SupportsPlatformService(IFMXPhoneDialerService, IInterface(PhoneService)) then
+          begin
           try
-            DeviceInfo.diMobileOperator := PhoneService.GetCarrier.GetCarrierName + ' ' +
-              PhoneService.GetCarrier.GetMobileCountryCode
+          DeviceInfo.diMobileOperator := PhoneService.GetCarrier.GetCarrierName + ' ' +
+          PhoneService.GetCarrier.GetMobileCountryCode
           except
           end;
-        end;
+          end; }
 {$ENDIF}
       end;
     pfAndroid:

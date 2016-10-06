@@ -1,9 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<BorlandProject>
-  <ActiveMobileDevice>   <NoProfile Android="066ab2310ac64b09"/>
-    <Pmax iOSSimulator="_iossimulator_22642830-B5CA-4117-A1AE-46DFFA83CA4A"/>
-  </ActiveMobileDevice>
-  <Transactions>
-    <Transaction>2016.09.26 15:16:14.833,E:\YandexDisk\demos\DeviceInfo\FMX.DeviceInfo.pas=E:\YandexDisk\demos\DeviceInfo\uDevice.pas</Transaction>
-  </Transactions>
-</BorlandProject>
