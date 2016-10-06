@@ -1,6 +1,8 @@
 # DeviceInfo
 # Device Info [Windows/Mac/IOS/Android]
 
+### not work on IOS Simulator
+
 ## Information
 ```
  TmyDeviceInfo = record
