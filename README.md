@@ -1,6 +1,11 @@
 # DeviceInfo
 # Device Info [Windows/Mac/IOS/Android]
 
+#### Note:
+#### ANDROID permissions:
+####  --- access_network_state
+####  --- acces_wifi_state
+
 ## Information
 ```
  TmyDeviceInfo = record
@@ -34,3 +39,6 @@
 * function IsTablet: Boolean; - _the application is running on the tablet? [ALL PLATFORMS]_
 * function IsPortraitOrientation: Boolean; - _current orientation is a Portrait? [ALL PLATFORMS]_
 * function IsLargePhone: Boolean; - _Phablet? [ANDROID/IOS]_
+
+![Android] (screenshots/android.png) ![Windows] (screenshots/win.png)
+![IOS] (screenshots/ios.png) ![MAC OS(VM)] (screenshots/macos.png)
