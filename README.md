@@ -2,6 +2,9 @@
 # Device Info [Windows/Mac/IOS/Android]
 
 #### Note: not work on IOS Simulator
+#### ANDROID permissions:
+####  -access_network_state
+####  -acces_wifi_state
 
 ## Information
 ```
@@ -36,3 +39,5 @@
 * function IsTablet: Boolean; - _the application is running on the tablet? [ALL PLATFORMS]_
 * function IsPortraitOrientation: Boolean; - _current orientation is a Portrait? [ALL PLATFORMS]_
 * function IsLargePhone: Boolean; - _Phablet? [ANDROID/IOS]_
+
+![Android] (sreenshot\android.png)
