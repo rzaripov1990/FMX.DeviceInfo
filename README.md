@@ -1,10 +1,10 @@
 # DeviceInfo
 # Device Info [Windows/Mac/IOS/Android]
 
-#### Note: not work on IOS Simulator
+#### Note:
 #### ANDROID permissions:
-####  -access_network_state
-####  -acces_wifi_state
+####  --- access_network_state
+####  --- acces_wifi_state
 
 ## Information
 ```
@@ -40,4 +40,4 @@
 * function IsPortraitOrientation: Boolean; - _current orientation is a Portrait? [ALL PLATFORMS]_
 * function IsLargePhone: Boolean; - _Phablet? [ANDROID/IOS]_
 
-![Android] (sreenshot\android.png)
+![Android] (sreenshots/android.png)
