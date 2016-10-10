@@ -2,7 +2,10 @@ unit FMX.DeviceInfo;
 
 {
   Device Info
+
   author: ZuBy
+  https://github.com/rzaripov1990/DeviceInfo
+  rzaripov1990@gmail.com
 
   ANDROID permissions:
   ..access_network_state
