@@ -1,14 +1,7 @@
 # FMX.DeviceInfo
 [FireMonkey] Device Info [Windows/Mac/IOS/Android]
 
-
-# DeviceInfo
-# Device Info [Windows/Mac/IOS/Android]
-
-#### Note:
-#### ANDROID permissions:
-####  --- access_network_state
-####  --- acces_wifi_state
+#### Note: Permissions for Android: access_network_state / acces_wifi_state
 
 ```var
   di: TZDeviceInfo;
