@@ -3,7 +3,9 @@
 
 #### Note: Permissions for Android: access_network_state / acces_wifi_state
 
-```var
+```
+// uses FMX.ZDeviceInfo;
+var
   di: TZDeviceInfo;
 begin
   Memo1.Lines.Clear;
