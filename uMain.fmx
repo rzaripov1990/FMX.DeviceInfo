@@ -1,30 +1,36 @@
-object Form9: TForm9
-  Tag = 1
+object Form2: TForm2
   Left = 0
   Top = 0
-  Caption = 'DeviceInfo'
-  ClientHeight = 643
-  ClientWidth = 378
+  Caption = 'Form2'
+  ClientHeight = 409
+  ClientWidth = 321
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
-  OnActivate = FormActivate
-  DesignerMasterStyle = 3
-  object ListBox1: TListBox
-    Anchors = [akLeft, akTop, akRight, akBottom]
+  DesignerMasterStyle = 0
+  object Button1: TButton
     Position.X = 8.000000000000000000
     Position.Y = 8.000000000000000000
-    Size.Width = 361.000000000000000000
-    Size.Height = 629.000000000000000000
+    Size.Width = 185.000000000000000000
+    Size.Height = 33.000000000000000000
     Size.PlatformDefault = False
-    StyleLookup = 'transparentlistboxstyle'
     TabOrder = 0
-    DisableFocusEffect = True
-    ItemHeight = 50.000000000000000000
-    DefaultItemStyles.ItemStyle = 'listboxitembottomdetail'
-    DefaultItemStyles.GroupHeaderStyle = ''
-    DefaultItemStyles.GroupFooterStyle = ''
-    Viewport.Width = 361.000000000000000000
-    Viewport.Height = 629.000000000000000000
+    Text = #1055#1086#1083#1091#1095#1080#1090#1100' '#1080#1085#1092#1086#1088#1084#1072#1094#1080#1102
+    OnClick = Button1Click
+  end
+  object Memo1: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    ReadOnly = True
+    TextSettings.WordWrap = True
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    Position.X = 8.000000000000000000
+    Position.Y = 48.000000000000000000
+    Size.Width = 305.000000000000000000
+    Size.Height = 353.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    Viewport.Width = 301.000000000000000000
+    Viewport.Height = 349.000000000000000000
   end
 end
