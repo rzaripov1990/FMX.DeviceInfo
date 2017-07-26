@@ -1,7 +1,7 @@
 # FMX.DeviceInfo
 [FireMonkey] Device Info [Windows/Mac/IOS/Android]
 
-#### Note: Permissions for Android: access_network_state / acces_wifi_state
+#### Note: Permissions for Android: access_network_state / acces_wifi_state / read_phone_state
 
 ```
 // uses FMX.ZDeviceInfo;
