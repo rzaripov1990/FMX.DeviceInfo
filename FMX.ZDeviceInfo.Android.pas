@@ -38,7 +38,8 @@ uses
   AndroidApi.JNI.GraphicsContentViewText, AndroidApi.JNI.OS, AndroidApi.Helpers, AndroidApi.JNI.Net,
   AndroidApi.JNI.JavaTypes, AndroidApi.JNIBridge, AndroidApi.JNI.Provider, AndroidApi.JNI.Telephony,
   FMX.PhoneDialer, FMX.PhoneDialer.Android, FMX.Platform.Android,
-  AndroidApi.JNI.Java.Net;
+  AndroidApi.JNI.Java.Net,
+  AndroidApi.JNI.Android.Security;
 // , AndroidApi.Log;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -166,12 +167,12 @@ var
 begin
   Result := TZNetworkConnectionType.None;
   ConnectivityManager := GetConnectivityManager;
-  if Assigned(ConnectivityManager) then
-  begin
-    ActiveNetwork := ConnectivityManager.getActiveNetworkInfo;
-    if Assigned(ActiveNetwork) and ActiveNetwork.isConnected then
-      Result := getMobileType(ActiveNetwork.getType);
-  end;
+  if ConnectivityManager = nil then
+    exit;
+
+  ActiveNetwork := ConnectivityManager.getActiveNetworkInfo;
+  if Assigned(ActiveNetwork) and ActiveNetwork.isConnected then
+    Result := getMobileType(ActiveNetwork.getType);
 end;
 
 {
@@ -184,10 +185,10 @@ var
   WifiManager: JWifiManager;
   WifiInfo: JWifiInfo;
 
-  Intf: JNetworkInterface;
-  Adrs: JInetAddress;
+  // Intf: JNetworkInterface;
+  // Adrs: JInetAddress;
 
-  AdrsEnum: JEnumeration;
+  // AdrsEnum: JEnumeration;
 begin
   aMac := '02:00:00:00:00:00';
   aWifiIP := 'unknown';
@@ -204,12 +205,12 @@ begin
       end;
     TZNetworkConnectionType.Mobile, TZNetworkConnectionType.Ethernet:
       begin
-        Intf := TJNetworkInterface.JavaClass.getByName(StringToJString('eth0'));
-        if Intf = nil then
-          Intf := TJNetworkInterface.JavaClass.getByName(StringToJString('wlan0'));
-        if Intf = nil then
-          exit;
-        Log.d(':: ZDeviceInfo :: interface :: ' + JStringToString(Intf.getDisplayName));
+        // Intf := TJNetworkInterface.JavaClass.getByName(StringToJString('eth0'));
+        // if Intf = nil then
+        // Intf := TJNetworkInterface.JavaClass.getByName(StringToJString('wlan0'));
+        // if Intf = nil then
+        // exit;
+        // Log.d(':: ZDeviceInfo :: interface :: ' + JStringToString(Intf.getDisplayName));
 
         // while (Intf <> nil) and (IntfEnum.hasMoreElements) do
         // begin
@@ -238,11 +239,11 @@ begin
       end;
   end;
 
-  (*exit;
+  (* exit;
 
-  // Hot Spot #2
-  if aWifiIP.Equals('0.0.0.0') then
-  begin
+    // Hot Spot #2
+    if aWifiIP.Equals('0.0.0.0') then
+    begin
     // IntfEnum := TJNetworkInterface.JavaClass.getNetworkInterfaces;
 
     Intf := TJNetworkInterface.JavaClass.getByName(StringToJString('wlan0'));
@@ -250,32 +251,32 @@ begin
     // begin
     // Intf := TJNetworkInterface.Wrap((IntfEnum.nextElement as ILocalObject).GetObjectID);
     Log.d(':: ZDeviceInfo :: first interface :: ' + JStringToString(Intf.getDisplayName) + ' :: ' +
-      JStringToString(Intf.getName));
+    JStringToString(Intf.getName));
 
     // while (Intf <> nil) and (IntfEnum.hasMoreElements) do
     // begin
     AdrsEnum := Intf.getInetAddresses;
     if AdrsEnum.hasMoreElements then
     begin
-      Adrs := TJInetAddress.Wrap((AdrsEnum.nextElement as ILocalObject).GetObjectID);
-      Log.d(':: ZDeviceInfo :: first address :: ' + JStringToString(Intf.getDisplayName) + ' :: ' +
-        JStringToString(Adrs.getHostName) + ' :: ' + JStringToString(Adrs.getHostAddress));
+    Adrs := TJInetAddress.Wrap((AdrsEnum.nextElement as ILocalObject).GetObjectID);
+    Log.d(':: ZDeviceInfo :: first address :: ' + JStringToString(Intf.getDisplayName) + ' :: ' +
+    JStringToString(Adrs.getHostName) + ' :: ' + JStringToString(Adrs.getHostAddress));
 
-      while (Adrs <> nil) do
-      begin
-        if (not Adrs.isLoopbackAddress) then
-        begin
-          Log.d(':: ZDeviceInfo :: address :: ' + JStringToString(Adrs.getHostAddress) + ' :: ' +
-            JStringToString(Adrs.getHostName) + ' :: ' + JStringToString(Adrs.getCanonicalHostName));
-          aWifiIP := JStringToString(Adrs.getHostAddress);
-          break;
-        end;
+    while (Adrs <> nil) do
+    begin
+    if (not Adrs.isLoopbackAddress) then
+    begin
+    Log.d(':: ZDeviceInfo :: address :: ' + JStringToString(Adrs.getHostAddress) + ' :: ' +
+    JStringToString(Adrs.getHostName) + ' :: ' + JStringToString(Adrs.getCanonicalHostName));
+    aWifiIP := JStringToString(Adrs.getHostAddress);
+    break;
+    end;
 
-        Adrs := TJInetAddress.Wrap((AdrsEnum.nextElement as ILocalObject).GetObjectID);
-        // if not Adrs.isLoopbackAddress then
-        Log.d(':: ZDeviceInfo :: address :: ' + JStringToString(Intf.getDisplayName) + ' :: ' +
-          JStringToString(Adrs.getHostName) + ' :: ' + JStringToString(Adrs.getHostAddress));
-      end;
+    Adrs := TJInetAddress.Wrap((AdrsEnum.nextElement as ILocalObject).GetObjectID);
+    // if not Adrs.isLoopbackAddress then
+    Log.d(':: ZDeviceInfo :: address :: ' + JStringToString(Intf.getDisplayName) + ' :: ' +
+    JStringToString(Adrs.getHostName) + ' :: ' + JStringToString(Adrs.getHostAddress));
+    end;
     end;
 
     // Intf := TJNetworkInterface.Wrap((IntfEnum.nextElement as ILocalObject).GetObjectID);
@@ -284,7 +285,7 @@ begin
     // JStringToString(Intf.getName));
     // end;
     // end;
-  end;*)
+    end; *)
 end;
 // :: ZDeviceInfo :::: ZDeviceInfo :::: ZDeviceInfo :::: ZDeviceInfo :::: ZDeviceInfo :::: ZDeviceInfo :::: ZDeviceInfo :::: ZDeviceInfo :::: ZDeviceInfo :::: ZDeviceInfo :::: ZDeviceInfo ::-------
 
@@ -312,7 +313,8 @@ end;
 
 function TZAndroidDeviceInfo.DeviceID: string;
 begin
-  Result := TAndroidHelper.JStringToString(MainActivity.getDeviceID);
+  Result := JStringToString(TJSettings_Secure.JavaClass.getString(TAndroidHelper.Context.getContentResolver,
+    TJSettings_Secure.JavaClass.ANDROID_ID));
 end;
 
 function TZAndroidDeviceInfo.IPAddress: string;
@@ -343,7 +345,7 @@ begin
   end
   else
   begin
-    Provider := JStringToString(TJSettings_Secure.JavaClass.GetString(TAndroidHelper.Context.getContentResolver,
+    Provider := JStringToString(TJSettings_Secure.JavaClass.getString(TAndroidHelper.Context.getContentResolver,
       TJSettings_system.JavaClass.LOCATION_PROVIDERS_ALLOWED));
     if HIGH_ACCURACY then
       Result := Pos('gps', Provider) > 0

@@ -69,9 +69,26 @@ begin
     begin
       FWbemObject := Unassigned;
       break;
-      exit;
     end;
+  end;
+end;
+
+function WinBuildNumber: string;
+var
+  FSWbemLocator, FWMIService, FWbemObjectSet, FWbemObject: OLEVariant;
+  oEnum: IEnumvariant;
+  iValue: LongWord;
+begin
+  FSWbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
+  FWMIService := FSWbemLocator.ConnectServer('localhost', 'root\CIMV2', '', '');
+  FWbemObjectSet := FWMIService.ExecQuery('SELECT BuildNumber FROM Win32_OperatingSystem', 'WQL', 0);
+
+  oEnum := IUnknown(FWbemObjectSet._NewEnum) as IEnumvariant;
+  while oEnum.Next(1, FWbemObject, iValue) = 0 do
+  begin
+    Result := VarToStr(FWbemObject.BuildNumber);
     FWbemObject := Unassigned;
+    break;
   end;
 end;
 // ---------------------------------------------------------------------------------------------------------------------
@@ -155,7 +172,8 @@ end;
 
 function TZWindowsDeviceInfo.PlatformVer: string;
 begin
-  Result := TOSVersion.Major.ToString + '.' + TOSVersion.Minor.ToString + ' build ' + TOSVersion.Build.ToString;
+  Result := TOSVersion.Major.ToString + '.' + TOSVersion.Minor.ToString + ' build ' + WinBuildNumber;
+  // + TOSVersion.Build.ToString;
 end;
 
 procedure RegisterService;
