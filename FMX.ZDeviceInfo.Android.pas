@@ -34,6 +34,7 @@ implementation
 
 uses
   System.SysUtils,
+  System.NetEncoding,
   FMX.Types,
   AndroidApi.JNI.GraphicsContentViewText, AndroidApi.JNI.OS, AndroidApi.Helpers, AndroidApi.JNI.Net,
   AndroidApi.JNI.JavaTypes, AndroidApi.JNIBridge, AndroidApi.JNI.Provider, AndroidApi.JNI.Telephony,
@@ -313,8 +314,8 @@ end;
 
 function TZAndroidDeviceInfo.DeviceID: string;
 begin
-  Result := JStringToString(TJSettings_Secure.JavaClass.getString(TAndroidHelper.Context.getContentResolver,
-    TJSettings_Secure.JavaClass.ANDROID_ID));
+  Result := AnsiLowerCase(TNetEncoding.Base64.Encode(JStringToString(TJSettings_Secure.JavaClass.getString
+    (TAndroidHelper.Context.getContentResolver, TJSettings_Secure.JavaClass.ANDROID_ID))));
 end;
 
 function TZAndroidDeviceInfo.IPAddress: string;

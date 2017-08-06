@@ -7,7 +7,7 @@
         <DeviceId Condition="'$(Platform)'=='Android'">Android_4.1.2</DeviceId>
         <DeviceId Condition="'$(Platform)'=='iOSDevice32'"/>
         <DeviceId Condition="'$(Platform)'=='iOSDevice64'"/>
-        <DeviceId Condition="'$(Platform)'=='iOSSimulator'">iPhone5</DeviceId>
+        <DeviceId Condition="'$(Platform)'=='iOSSimulator'">A8F72BBE-64E3-4724-99CA-F0ECBD1975C4</DeviceId>
     </PropertyGroup>
     <ItemGroup Condition="'$(Platform)'=='iOSDevice64'"/>
     <ItemGroup Condition="'$(Platform)'=='Win64'"/>
@@ -65,6 +65,15 @@
             <RemoteDir>prjDeviceInfo.app\..\</RemoteDir>
             <RemoteName>prjDeviceInfo.entitlements</RemoteName>
             <DeployClass>ProjectOSXEntitlements</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="OSX32\Debug\prjDeviceInfo.rsm" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>prjDeviceInfo.app\Contents\MacOS\</RemoteDir>
+            <RemoteName>prjDeviceInfo.rsm</RemoteName>
+            <DeployClass>DebugSymbols</DeployClass>
             <Operation>1</Operation>
             <LocalCommand/>
             <RemoteCommand/>
@@ -523,6 +532,15 @@
             <RemoteName>FM_ApplicationIcon_120x120.png</RemoteName>
             <DeployClass>iPhone_AppIcon120</DeployClass>
             <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="iOSSimulator\Debug\prjDeviceInfo.rsm" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>prjDeviceInfo.app\</RemoteDir>
+            <RemoteName>prjDeviceInfo.rsm</RemoteName>
+            <DeployClass>DebugSymbols</DeployClass>
+            <Operation>1</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>

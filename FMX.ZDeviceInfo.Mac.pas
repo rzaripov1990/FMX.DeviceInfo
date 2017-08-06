@@ -3,12 +3,10 @@ unit FMX.ZDeviceInfo.Mac;
 interface
 
 uses
-  FMX.Platform, FMX.ZDeviceInfo,
-  FMX.PhoneDialer_iOSfix,
-  FMX.PhoneDialer;
+  FMX.Platform, FMX.ZDeviceInfo;
 
 type
-  TZiOSDeviceInfo = class(TInterfacedObject, IZDeviceInfoService)
+  TZMacDeviceInfo = class(TInterfacedObject, IZDeviceInfoService)
     { IZDeviceInfoService }
     function PlatformVer: string;
     function Architecture2: string;
@@ -32,23 +30,51 @@ procedure UnregisterService;
 
 implementation
 
-{ TZiOSDeviceInfo }
+{ TZMacDeviceInfo }
 
 uses
   System.SysUtils,
+  System.NetEncoding,
   MacApi.Foundation,
-  MacApi.ObjectiveC, Posix.Wchar, MacApi.CoreFoundation, MacApi.Dispatch, Posix.SysSocket, Posix.SysSysctl;
+  MacApi.ObjectiveC,
+  MacApi.Dispatch,
+  MacApi.CoreFoundation,
+  Posix.Wchar, Posix.SysSocket, Posix.SysSysctl,
+  Posix.Base, Posix.NetIf,
+  Posix.NetinetIn, Posix.ArpaInet;
 
-// ---------------------------------------------------------------------------------------------------------------------
+type
+  u_char = UInt8;
+  u_short = UInt16;
+
+  sockaddr_dl = record
+    sdl_len: u_char; // * Total length of sockaddr */
+    sdl_family: u_char; // * AF_LINK */
+    sdl_index: u_short; // * if != 0, system given index for interface */
+    sdl_type: u_char; // * interface type */
+    sdl_nlen: u_char; // * interface name length, no trailing 0 reqd. */
+    sdl_alen: u_char; // * link level address length */
+    sdl_slen: u_char; // * link layer selector length */
+    sdl_data: array [0 .. 11] of AnsiChar; // * minimum work area, can be larger;
+    // contains both if name and ll address */
+  end;
+
+  psockaddr_dl = ^sockaddr_dl;
+
 const
-  libc = '/usr/lib/libc.dylib';
+  IFT_ETHER = $6; // if_types.h
+
+  // ---------------------------------------------------------------------------------------------------------------------
 function sysctlbyname(Name: MarshaledAString; oldp: pointer; oldlen: Psize_t; newp: pointer; newlen: size_t): integer;
   cdecl; external libc name _PU + 'sysctlbyname';
-
 function sysctl(Name: PInteger; namelen: cardinal; oldp: pointer; oldlen: Psize_t; newp: pointer; newlen: size_t)
   : integer; cdecl; external libc name _PU + 'sysctl';
 
-function if_nametoindex(ifname: MarshaledAString): cardinal; cdecl; external libc name _PU + 'if_nametoindex';
+function getifaddrs(var ifap: pifaddrs): integer; cdecl; external libc name _PU + 'getifaddrs';
+{$EXTERNALSYM getifaddrs}
+procedure freeifaddrs(ifp: pifaddrs); cdecl; external libc name _PU + 'freeifaddrs';
+{$EXTERNALSYM freeifaddrs}
+// function if_nametoindex(ifname: MarshaledAString): cardinal; cdecl; external libc name _PU + 'if_nametoindex';
 
 function GetSysInfoByName(typeSpecifier: string): string;
 var
@@ -61,136 +87,159 @@ begin
   Result := TEncoding.UTF8.GetString(AResult);
 end;
 
-(*
-  function GetMacAddress: string;
+function convertor(ip: integer): string;
+begin
+  Result := Format('%d.%d.%d.%d', [ip and $FF, ip shr 8 and $FF, ip shr 16 and $FF, ip shr 24 and $FF])
+end;
 
-  type
-  sockaddr_dl = record
-  sdl_len: char;
-  sdl_family: char;
-  sdl_index: word;
-  sdl_type: char;
-  sdl_nlen: char;
-  sdl_alen: char;
-  sdl_slen: char;
-  sdl_data: string[12];
+function GetIPAddress: string;
+var
+  ifap, next: pifaddrs;
+  sip4: Psockaddr_in;
+  sip6: sockaddr_in6;
+  MacAddr: array [0 .. 5] of Byte;
+  I: integer;
+begin
+  Result := '';
+  try
+    if getifaddrs(ifap) = 0 then
+    begin
+      try
+        next := ifap;
+        while next <> nil do
+        begin
+          case next.ifa_addr.sa_family of
+            AF_INET:
+              begin
+                // sip4 := @next;
+                // Result := convertor(sip4.sin_addr.s_addr);
+                break;
+              end;
+            AF_INET6:
+              begin
+                // sip6 := @next;
+                // Result := (sip6.sin6_addr.s_addr);
+                break;
+              end;
+          end;
+          next := next.ifa_next;
+        end;
+      finally
+        freeifaddrs(ifap);
+      end;
+    end;
+    if Result = '' then
+      Result := 'unknown';
+  except
+    Result := 'unknown';
   end;
+end;
 
-  type
-  if_data = record
+function GetMacAddress: string;
+var
+  ifap, next: pifaddrs;
+  sdp: psockaddr_dl;
+  MacAddr: array [0 .. 5] of Byte;
+begin
+  Result := '';
+  try
+    if getifaddrs(ifap) = 0 then
+    begin
+      try
+        next := ifap;
+        while next <> nil do
+        begin
+          case next.ifa_addr.sa_family of
+            AF_LINK:
+              begin
+                sdp := psockaddr_dl(next.ifa_addr);
+                if sdp.sdl_type = IFT_ETHER then
+                begin
+                  Move(pointer(PAnsiChar(@sdp^.sdl_data[0]) + sdp.sdl_nlen)^, MacAddr, 6);
+                  Result := Result + IntToHex(MacAddr[0], 2) + ':' + IntToHex(MacAddr[1], 2) + ':' +
+                    IntToHex(MacAddr[2], 2) + ':' + IntToHex(MacAddr[3], 2) + ':' + IntToHex(MacAddr[4], 2) + ':' +
+                    IntToHex(MacAddr[5], 2) + ',';
+                  break;
+                end;
+              end;
+          end;
+          next := next.ifa_next;
+        end;
+      finally
+        freeifaddrs(ifap);
+      end;
+    end;
+    if Result = '' then
+      Result := '02:00:00:00:00:00';
+  except
+    Result := '02:00:00:00:00:00';
   end;
-
-  type
-  if_msghdr = record
-  ifm_msglen: word;
-  ifm_version: char;
-  ifm_type: char;
-  ifm_addrs: integer;
-  ifm_flags: integer;
-  ifm_index: word;
-  ifm_data: if_data;
-  end;
-
-  const
-  NET_RT_IFLIST = 3;
-
-  var
-  mib: array [0 .. 5] of integer;
-  length: size_t;
-  data: NSMutableData;
-  socketAddress: sockaddr_dl;
-  // if_msghdr: if_msghdr;
-  coreAddress: char;
-  begin
-  mib[0] := CTL_NET;
-  mib[1] := AF_ROUTE;
-  mib[2] := 0;
-  mib[3] := AF_LINK;
-  mib[4] := NET_RT_IFLIST;
-  mib[5] := if_nametoindex(MarshaledAString(TMarshal.AsAnsi('en0')));
-
-  // get message size
-  length = 0;
-  if (mib[5] = 0) or (sysctl(mib, length(mib), nil, @length, nil, 0) < 0) or (length = 0) then
-  exit('unknown');
-
-  // get message
-  data = TNSMutableData.Wrap(TNSMutableData.OCClass.dataWithLength(length));
-  if (sysctl(mib, length(mib), data.mutableBytes, @length, nil, 0) < 0) then
-  exit('unknown');
-
-  // get socket address
-  // socketAddress = data.mutableBytes + sizeof(if_msghdr);
-  // coreAddress = LLADDR(socketAddress);
-  // MacAddress = [[NSString alloc] initWithFormat: @" % 02 X: % 02 X: % 02 X: % 02 X: % 02 X: % 02 X ", coreAddress[0],
-  // coreAddress[1], coreAddress[2], coreAddress[3], coreAddress[4], coreAddress[5]];
-  end;
-*)
+end;
 // ---------------------------------------------------------------------------------------------------------------------
 
-function TZiOSDeviceInfo.Architecture2: string;
+function TZMacDeviceInfo.Architecture2: string;
 begin
   Result := '';
 end;
 
-function TZiOSDeviceInfo.Device: string;
+function TZMacDeviceInfo.Device: string;
 begin
-  Result := 'MacOS (' + trim(GetSysInfoByName('hw.model')) + ')';
+  Result := 'MacOS (' + Trim(GetSysInfoByName('hw.model')) + ')';
 end;
 
-function TZiOSDeviceInfo.DeviceID: string;
+function TZMacDeviceInfo.DeviceID: string;
 begin
-  Result := '';
+  Result := AnsiLowerCase(TBase64Encoding.Create.Encode(GetMacAddress));
 end;
 
-function TZiOSDeviceInfo.IPAddress: string;
+function TZMacDeviceInfo.IPAddress: string;
 begin
-  Result := 'unknown';
+  Result := GetIPAddress;
 end;
 
-function TZiOSDeviceInfo.IsGPSActive(HIGH_ACCURACY: Boolean): Boolean;
+function TZMacDeviceInfo.IsGPSActive(HIGH_ACCURACY: Boolean): Boolean;
 begin
   Result := false;
 end;
 
-function TZiOSDeviceInfo.IsIntel: Boolean;
+function TZMacDeviceInfo.IsIntel: Boolean;
 begin
   Result := TOSVersion.Architecture in [arIntelX86, arIntelX64];
 end;
 
-function TZiOSDeviceInfo.IsNetConnected: Boolean;
+function TZMacDeviceInfo.IsNetConnected: Boolean;
 begin
   Result := false;
 end;
 
-function TZiOSDeviceInfo.MacAddress: string;
+function TZMacDeviceInfo.MacAddress: string;
 begin
-  Result := 'unknown';
+  Result := GetMacAddress;
 end;
 
-function TZiOSDeviceInfo.MobileOperator: string;
+function TZMacDeviceInfo.MobileOperator: string;
 begin
   Result := 'not support';
 end;
 
-function TZiOSDeviceInfo.NetworkConnectionType: TZNetworkConnectionType;
+function TZMacDeviceInfo.NetworkConnectionType: TZNetworkConnectionType;
 begin
   Result := TZNetworkConnectionType.Unknown;
 end;
 
-function TZiOSDeviceInfo.MobileDataType: TZMobileDataType;
+function TZMacDeviceInfo.MobileDataType: TZMobileDataType;
 begin
   Result := TZMobileDataType.None;
 end;
 
-function TZiOSDeviceInfo.PlatformVer: string;
+function TZMacDeviceInfo.PlatformVer: string;
 begin
   Result := GetSysInfoByName('kern.ostype') + ' ' + GetSysInfoByName('kern.osrelease');
 end;
 
 procedure RegisterService;
 begin
-  TPlatformServices.Current.AddPlatformService(IZDeviceInfoService, TZiOSDeviceInfo.Create);
+  TPlatformServices.Current.AddPlatformService(IZDeviceInfoService, TZMacDeviceInfo.Create);
 end;
 
 procedure UnregisterService;

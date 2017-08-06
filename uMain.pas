@@ -41,6 +41,9 @@ begin
     Memo1.Lines.Add('Architecture2: ' + di.Architecture2);
     Memo1.Lines.Add('IsIntel: ' + di.IsIntel.ToString(TUseBoolStrs.True));
     Memo1.Lines.Add('Device: ' + di.Device);
+    Memo1.Lines.Add('---------');
+    Memo1.Lines.Add('DeviceID: ' + di.DeviceID);
+    Memo1.Lines.Add('---------');
     Memo1.Lines.Add('MacAddress: ' + di.MacAddress);
     Memo1.Lines.Add('IPAddress: ' + di.IPAddress);
     Memo1.Lines.Add('LangID: ' + di.LangID);

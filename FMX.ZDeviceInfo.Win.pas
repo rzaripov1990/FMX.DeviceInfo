@@ -34,6 +34,7 @@ implementation
 
 uses
   System.SysUtils,
+  System.NetEncoding,
   System.Variants,
   Winapi.Windows,
   Winapi.ActiveX,
@@ -104,8 +105,15 @@ begin
 end;
 
 function TZWindowsDeviceInfo.DeviceID: string;
+var
+  aMac, aIP: string;
 begin
-  Result := '';
+  try
+    GetAddress(aMac, aIP);
+    Result := AnsiLowerCase(TNetEncoding.Base64.Encode(aMac));
+  except
+    Result := '';
+  end;
 end;
 
 function TZWindowsDeviceInfo.IPAddress: string;
@@ -149,7 +157,7 @@ begin
   try
     GetAddress(Result, aIP);
   except
-    Result := 'unknown';
+    Result := '02:00:00:00:00:00';
   end;
 end;
 

@@ -36,6 +36,7 @@ implementation
 
 uses
   System.SysUtils,
+  System.NetEncoding,
   iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.UIKit, FMX.Helpers.iOS;
 
 function TZiOSDeviceInfo.Architecture2: string;
@@ -52,7 +53,7 @@ end;
 function TZiOSDeviceInfo.DeviceID: string;
 begin
   with TUIDevice.Wrap(TUIDevice.OCClass.currentDevice) do
-    Result := identifierForVendor.UUIDString.UTF8String;
+    Result := AnsiLowerCase(TNetEncoding.Base64.Encode(identifierForVendor.UUIDString.UTF8String));
 end;
 
 function TZiOSDeviceInfo.IPAddress: string;
